@@ -1,7 +1,5 @@
 package assignment4;
 
-import java.util.List;
-
 public class Main {
 
 	 public static void main(String[] args) {
@@ -10,7 +8,7 @@ public class Main {
 	        CSVParser csvParser = new CSVParser();
 	        
 	        // Parse the CSV file to obtain a list of Student objects
-	        List<Student> students = csvParser.parseCSV(csvFile);
+	        Student[] students = csvParser.parseCSV(csvFile);
 	        
 	        // Process and write the sorted data into separate CSV files
 	        csvParser.processAndWriteCSV(students, "course1.csv", "COMPSCI");

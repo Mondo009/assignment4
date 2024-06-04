@@ -6,15 +6,17 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CSVParser {
-    public List<Student> parseCSV(String csvFile) {
-        List<Student> students = new ArrayList<>();
-
+    public Student[] parseCSV(String csvFile) {
+       // List<Student> students = new ArrayList<>(); // Array [5]
+    	Student[] students = new Student[110];
+    	int i = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             String line;
             br.readLine(); // Skip header line
@@ -24,48 +26,83 @@ public class CSVParser {
                 String studentName = data[1];
                 String course = data[2];
                 String grade = data[3]; // Modified to String
-                students.add(new Student(studentId, studentName, course, grade));
+                students[i] = new Student(studentId, studentName, course, grade);
+                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return Arrays.copyOf(students, i); 
+        }
 
-        return students;
-    }
+        public void processAndWriteCSV(Student[] students, String csvFileName, String course) {
+            Arrays.sort(students, Comparator.comparing(Student::getGrade).reversed());
+            writeCSVFiles(students, csvFileName, course);
+        }
 
-    public void processAndWriteCSV(List<Student> students, String csvFileName, String course) {
-        Collections.sort(students, Comparator.comparing(Student::getGrade).reversed());
-        writeCSVFiles(students, csvFileName, course);
-    }
-
-    private void writeCSVFiles(List<Student> students, String csvFileName, String course) {
-    	System.out.println(students);
-//            String csvFileName = course.toLowerCase().replaceAll("\\s", "") + ".csv";
+        private void writeCSVFiles(Student[] students, String csvFileName, String course) {
+            System.out.println(Arrays.toString(students));
             System.out.println("Creating file:" + csvFileName);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFileName))) {
                 writer.write("Student ID,Student Name,Course,Grade\n");
                 int studentCount = 0;
                 for (Student student : students) {
-                	System.out.println(student.getCourse());
                     if (student.getCourse().contains(course)) {
                         writer.write(student.getStudentId() + "," + student.getStudentName() + "," +
                                 student.getCourse() + "," + student.getGrade() + "\n");
                         studentCount++;
                     }
                 }
-                System.out.println("Number of Students written for"+ course +":" + studentCount);
+                System.out.println("Number of Students written for " + course + ": " + studentCount);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        private String[] getCourses(Student[] students) {
+            return Arrays.stream(students)
+                    .map(Student::getCourse)
+                    .distinct()
+                    .toArray(String[]::new);
+        }
     }
 
-    private List<String> getCourses(List<Student> students) {
-        return students.stream()
-                .map(Student::getCourse)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-}
+//        return students;
+//    }
+//
+//    public void processAndWriteCSV(List<Student> students, String csvFileName, String course) {
+//        Collections.sort(students, Comparator.comparing(Student::getGrade).reversed());
+//        writeCSVFiles(students, csvFileName, course);
+//    }
+//
+//    private void writeCSVFiles(List<Student> students, String csvFileName, String course) {
+//    	System.out.println(students);
+////            String csvFileName = course.toLowerCase().replaceAll("\\s", "") + ".csv";
+//            System.out.println("Creating file:" + csvFileName);
+//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFileName))) {
+//                writer.write("Student ID,Student Name,Course,Grade\n");
+//                int studentCount = 0;
+//                for (Student student : students) {
+//                	System.out.println(student.getCourse());
+//                    if (student.getCourse().contains(course)) {
+//                        writer.write(student.getStudentId() + "," + student.getStudentName() + "," +
+//                                student.getCourse() + "," + student.getGrade() + "\n");
+//                        studentCount++;
+//                    }
+//                }
+//                System.out.println("Number of Students written for"+ course +":" + studentCount);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//    }
+//
+//    private List<String> getCourses(List<Student> students) {
+//        return students.stream()
+//                .map(Student::getCourse)
+//                .distinct()
+//                .collect(Collectors.toList());
+//    }
+//}
 //	public List<Student> parseCSV(String csvFile) {
 //	  List<Student> students = new ArrayList<>();
 //
